@@ -36,7 +36,7 @@ struct data_t data[2];
 void *taskcli( void *opaque)
 {
 	void *result = NULL;
-	int sock = (int)opaque;
+	int sock = (int)(unsigned long)opaque;
 	unsigned long id = (unsigned long)pthread_self();
 
 	printf( "[%08lx]++managing sock=%d\n", id, sock);fflush( stdout);
@@ -118,7 +118,7 @@ void *taskser( void *opaque)
 void *task( void *opaque)
 {
 	void *result = NULL;
-	int delta = ((int)opaque) ? 1 : -1;
+	int delta = ((int)(unsigned long)opaque) ? 1 : -1;
 	unsigned int seed;
 	unsigned long id = (unsigned long)pthread_self();
 
