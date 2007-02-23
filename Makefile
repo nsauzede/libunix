@@ -19,7 +19,7 @@ EXT=
 TARGET2= bummer
 endif
 
-TARGET += test pipe
+TARGET += test$(EXT) pipe$(EXT)
 
 CFLAGS=	-Wall -Werror -g -O0
 #CFLAGS+=-m32
@@ -35,13 +35,13 @@ INSTALL= install
 else
 THREADF+=-lpthread
 endif
+LDFLAGS+=$(THREADF)
 
 
 all:	$(TARGET) $(TARGET2)
 
 bummer:
-	@echo "--- Nothing to do here as libunix should only be built/used on mingw32 platforms ---"
-	@touch libsocket.a
+	@echo "--- No lib to build here as libunix should only be built/used on mingw32 platforms ---"
 
 libunix.o: src/unix.c include/unistd.h include/sys/socket.h
 	$(CC) -c -o $@ $(CFLAGS) $<
@@ -49,10 +49,10 @@ libunix.o: src/unix.c include/unistd.h include/sys/socket.h
 libunix.a: libunix.o
 	$(AR) cru $@ $^
 
-test: test.c
+test$(EXT): test.c
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
-pipe: pipe.c
+pipe$(EXT): pipe.c
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
 clean: $(TARGET2)
