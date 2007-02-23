@@ -44,9 +44,10 @@ LDFLAGS+=$(THREADF)
 
 ifdef SOL8
 CFLAGS+=-D_REENTRANT
+LDFLAGS+=-lsocket
 endif
 
-all:	$(TARGET) $(TARGET2)
+all:	$(TARGET2) $(TARGET)
 
 bummer:
 	@echo "--- No lib to build here as libunix should only be built/used on mingw32 platforms ---"
