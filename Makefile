@@ -5,8 +5,13 @@ LIBUNIX=.
 ifndef CC
 CC:=gcc
 endif
+
 ifneq ($(strip $(shell $(CC) -v 2>&1 | grep "mingw")),)
 WIN32=true
+endif
+
+ifneq ($(strip $(shell $(CC) -v 2>&1 | grep -i "SunOS")),)
+SOL8=true
 endif
 
 TARGET=
@@ -37,11 +42,15 @@ THREADF+=-lpthread
 endif
 LDFLAGS+=$(THREADF)
 
+ifdef SOL8
+CFLAGS+=-D_REENTRANT
+endif
 
 all:	$(TARGET) $(TARGET2)
 
 bummer:
 	@echo "--- No lib to build here as libunix should only be built/used on mingw32 platforms ---"
+	@echo "--- Building only the test apps for compliance purposes ---"
 
 libunix.o: src/unix.c include/unistd.h include/sys/socket.h
 	$(CC) -c -o $@ $(CFLAGS) $<
@@ -55,7 +64,7 @@ test$(EXT): test.c
 pipe$(EXT): pipe.c
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
-clean: $(TARGET2)
+clean:
 	$(RM) $(TARGET) *.o
 
 install: all
