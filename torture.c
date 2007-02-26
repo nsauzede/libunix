@@ -57,7 +57,7 @@ int main_no_net()
 	_err = 9;
 	_ret = -1;
 	func = "close";			// should fail
-	result--;
+	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = close( p);
 	if ((ret != _ret || errno != _err) && _ret < 0)
@@ -76,7 +76,7 @@ int main_no_net()
 	result--;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = p = pipe( fds);
-	if ((ret != _ret || (errno != _err && errno != 120)) && _ret < 0)
+	if ((ret != _ret || errno != _err) && _ret < 0)
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -130,13 +130,13 @@ int main_net()
 	char *func;
 	int on;
 
-	_err = 97;
+	_err = EAFNOSUPPORT;
 	_ret = -1;
 	func = "socket";		// should fail
 	result--;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( -666, SOCK_STREAM, 0);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if ((ret != _ret || (errno != _err && errno != 120)) && _ret < 0)
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -168,7 +168,7 @@ int main_net()
 	result--;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, -777, 0);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if ((ret != _ret || (errno != _err && errno != 120)) && _ret < 0)
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -178,13 +178,13 @@ int main_net()
 	{
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
-	_err = 93;
+	_err = EBADF;
 	_ret = -1;
 	func = "socket";		// should fail
 	result--;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, SOCK_STREAM, -666);
-	if ((ret != _ret || (errno != _err && errno != 94)) && _ret < 0)
+	if ((ret != _ret || errno != _err) && _ret < 0)
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -210,14 +210,16 @@ int main_net()
 	{
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
+	
 	on = 1;
 	setsockopt( sock, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
+
 	len = sizeof( sa);
 	memset( &sa, 0, len);
 	sa.sin_family = AF_INET;
 	sa.sin_port = htons( 65534);		// should not exist
 	sa.sin_addr.s_addr = inet_addr( "127.0.0.1");
-	_err = 111;
+	_err = ECONNREFUSED;
 	_ret = -1;
 	func = "connect";
 	result--;
