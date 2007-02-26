@@ -5,6 +5,7 @@
 
 #include <windows.h>
 
+#include "compat_errno.h"
 #include "sys/select.h"
 
 #define usleep(t) Sleep(t / 1000)

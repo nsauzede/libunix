@@ -6,12 +6,15 @@ ifndef CC
 CC:=gcc
 endif
 
+CFLAGS=
+
 ifneq ($(strip $(shell $(CC) -v 2>&1 | grep "mingw")),)
 WIN32=true
 endif
 
 ifneq ($(strip $(shell $(CC) -v 2>&1 | grep -i "SunOS")),)
 SOL8=true
+CFLAGS+=-DSOL8
 endif
 
 TARGET=
@@ -26,7 +29,7 @@ endif
 
 TARGET += test$(EXT) pipe$(EXT) torture$(EXT)
 
-CFLAGS=	-Wall -Werror -g -O0
+CFLAGS+=	-Wall -Werror -g -O0
 #CFLAGS+=-m32
 #LDFLAGS=	-m32
 

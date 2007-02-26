@@ -5,6 +5,8 @@
 
 #include <winsock2.h>
 
+#include "compat_errno.h"
+
 #ifndef NO_COMPAT_SOCKET
 
 #ifdef select
