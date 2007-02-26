@@ -133,8 +133,11 @@ char * string_strerror( int errnum)
 		case -ECONNREFUSED:
 			result = "Connection refused";
 			break;
+		case -EAFNOSUPPORT:
+			result = "Address family not supported by protocol";
+			break;
 		default:
-			result = strerror( errnum);
+			result = strerror( -errnum);
 			break;
 	}
 

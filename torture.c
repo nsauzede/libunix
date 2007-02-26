@@ -15,7 +15,7 @@ int main()
 	int n;
 	socklen_t len;
 
-	sock = socket( -666, -777, -888);
+	sock = socket( -666, SOCK_STREAM, 0);
 	if (sock == -1)
 	{
 		perror( "socket");

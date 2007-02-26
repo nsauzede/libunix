@@ -30,10 +30,13 @@ CFLAGS=	-Wall -Werror -g -O0
 #CFLAGS+=-m32
 #LDFLAGS=	-m32
 
+LIB=	libunix.a
+LIBF=	-lunix
+
 THREADF=
 ifdef WIN32
 #LDFLAGS+= -L. -Wl,--whole-archive -lsocket -Wl,--no-whole-archive -lwsock32
-LDFLAGS+= -L$(LIBUNIX) -lunix -lws2_32
+LDFLAGS+= -L$(LIBUNIX) $(LIBF) -lws2_32
 CFLAGS+= -I./include
 #CFLAGS+= -mno-cygwin
 INSTALL= install
@@ -56,16 +59,16 @@ bummer:
 libunix.o: src/unix.c include/unistd.h include/sys/socket.h
 	$(CC) -c -o $@ $(CFLAGS) $<
 
-libunix.a: libunix.o
+$(LIB): libunix.o
 	$(AR) cru $@ $^
 
-test$(EXT): test.c
+test$(EXT): test.c $(LIB)
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
-pipe$(EXT): pipe.c
+pipe$(EXT): pipe.c $(LIB)
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
-torture$(EXT): torture.c
+torture$(EXT): torture.c $(LIB)
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
 clean:
