@@ -102,12 +102,16 @@ int unistd_close( int fd)
 {
 	int result = 0;
 
-//	printf( "%s\n", __func__);
+//	printf( "%s : fd=%d\n", __func__, fd);
 	errno = 0;
 	if (!CloseHandle( (HANDLE)fd))
 	{
 		errno = EBADF;
 		result = -1;
+	}
+	else
+	{
+		result = 1;
 	}
 
 	return result;

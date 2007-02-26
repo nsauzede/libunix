@@ -10,14 +10,14 @@ int main()
 	printf( "### Testing Non-net functions.. ###\n");
 	result = main_no_net();
 	if (result)
-		printf( "--- Returning with result=%d ---\n", result);
+		printf( "--- Error at %s:%d ---\n", __FILE__, result);
 	else
 		printf( "+++ Feeling groovy +++\n");
 
 	printf( "### Testing Net functions.. ###\n");
 	result = main_net();
 	if (result)
-		printf( "--- Returning with result=%d ---\n", result);
+		printf( "--- Error at %s:%d ---\n", __FILE__, result);
 	else
 		printf( "+++ Feeling groovy ++\n");
 
@@ -43,7 +43,7 @@ int main_no_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = p = pipe( NULL);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -59,8 +59,8 @@ int main_no_net()
 	func = "close";			// should fail
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
-	ret = close( p);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	ret = close( -666);
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -76,7 +76,7 @@ int main_no_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = p = pipe( fds);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -86,13 +86,14 @@ int main_no_net()
 	{
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
+#if 0
 	_err = 0;
 	_ret = 0;
 	func = "close";		// should work
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = close( p);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -102,11 +103,12 @@ int main_no_net()
 	{
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
+#endif
 
 	result = 0;
 err:
 
-	return 0;
+	return result;
 }
 
 #include <stdio.h>
@@ -136,7 +138,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( -666, SOCK_STREAM, 0);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || (errno != _err && errno != EPROTONOSUPPORT)) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -152,7 +154,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = close( sock);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -168,7 +170,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, -777, 0);
-	if ((ret != _ret || (errno != _err && errno != 120)) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -185,7 +187,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, SOCK_STREAM, -666);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -196,12 +198,12 @@ int main_net()
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
 	_err = 0;
-	_ret = 0;
+	_ret = 1;
 	func = "socket";		// should work
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, SOCK_STREAM, 0);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -226,7 +228,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = connect( sock, (const struct sockaddr *)&sa, len);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -245,7 +247,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = connect( sock, (const struct sockaddr *)&sa, len);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -262,7 +264,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	n = write( sock, buf, strlen( buf));
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -279,7 +281,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	n = send( sock, buf, strlen( buf), 0);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -298,7 +300,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = close( sock);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
