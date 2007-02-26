@@ -30,12 +30,13 @@ int main()
 
 int main_no_net()
 {
-	int p;
+	int p = -1;
 	int fds[2];
 	int result = 0;
 	int _err, ret, _ret;
 	char *func;
 
+#if 0
 	_err = 14;
 	_ret = -1;
 	func = "pipe";		// should fail
@@ -52,6 +53,7 @@ int main_no_net()
 	{
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
+#endif
 	_err = 9;
 	_ret = -1;
 	func = "close";			// should fail
