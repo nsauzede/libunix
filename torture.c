@@ -10,16 +10,16 @@ int main()
 	printf( "### Testing Non-net functions.. ###\n");
 	result = main_no_net();
 	if (result < 0)
-		printf( "returning with result=%d\n", result);
+		printf( "--- Returning with result=%d ---\n", result);
 	else
-		printf( "### Feeling groovy ###\n");
+		printf( "+++ Feeling groovy +++\n");
 
 	printf( "### Testing Net functions.. ###\n");
 	result = main_net();
 	if (result < 0)
-		printf( "returning with result=%d\n", result);
+		printf( "--- Returning with result=%d ---\n", result);
 	else
-		printf( "### Feeling groovy ###\n");
+		printf( "+++ Feeling groovy ++\n");
 
 	return 0;
 }
@@ -182,7 +182,7 @@ int main_net()
 	result--;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, SOCK_STREAM, -666);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if ((ret != _ret || (errno != _err && errno != 94)) && _ret < 0)
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
