@@ -13,6 +13,9 @@
 #define select socket_select
 #define close socket_close
 #define socket socket_socket
+#define connect socket_connect
+#define strerror string_strerror
+#define perror stdio_perror
 
 #endif
 
@@ -22,6 +25,9 @@ extern int socket_close( int fd);
 extern int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *exceptfds, struct timeval *timeout);
 extern int socket_socket(int domain, int type, int protocol);
+extern int socket_connect( int  sockfd,  const  struct sockaddr *serv_addr, socklen_t addrlen);
+extern char * string_strerror( int errnum);
+extern void stdio_perror( const char *s);
 
 #endif
 

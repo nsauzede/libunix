@@ -123,13 +123,37 @@ int compat_socket_init()
 	return result;
 }
 
+char * string_strerror( int errnum)
+{
+	char *result;
+
+	printf( "%s : errnum=%d\n", __func__, errnum);fflush( stdout);
+	switch (errnum)
+	{
+		case -ECONNREFUSED:
+			result = "Connection refused";
+			break;
+		default:
+			result = strerror( errnum);
+			break;
+	}
+
+	return result;
+}
+
+void stdio_perror( const char *s)
+{
+	printf( "%s\n", __func__);fflush( stdout);
+	printf( "%s: %s\n", s, string_strerror( errno));
+}
+
 int socket_errno()
 {
 	int _errno, err;
 
 //	printf( "socket_errno\n");fflush( stdout);
 	err = WSAGetLastError();
-//	printf( "%s: err=%d\n", __func__, err);
+	printf( "%s: err=%d\n", __func__, err);
 	switch (err)
 		{
 			case WSAEACCES:
@@ -156,6 +180,23 @@ int socket_errno()
 			case WSAENETUNREACH:
 				_errno = -ENETUNREACH;
 				break;
+			case WSAESOCKTNOSUPPORT:
+				_errno = -EINVAL;
+				break;
+			case WSAEPROTONOSUPPORT:
+				_errno = -EPROTONOSUPPORT;
+				break;
+			case WSAEAFNOSUPPORT:
+				_errno = -EAFNOSUPPORT;
+				break;
+				/*
+			case :
+				_errno = -;
+				break;
+			case :
+				_errno = -;
+				break;
+				*/
 
 			case WSANOTINITIALISED:
 //				printf( "WSA not initialized !!\n");
@@ -177,23 +218,22 @@ int socket_errno()
 			case WSAETIMEDOUT:
 			case WSAEWOULDBLOCK:
 			default:
+				printf( "%s: unknown error %d\n", __func__, err);fflush( stdout);
 //				_errno = -1;
 				_errno = 0;
 				break;
 		}
+	printf( "%s: err=%d returning %d\n", __func__, err, _errno);
 	return _errno;
 }
-
-extern int selec(int nfds, fd_set *readfds, fd_set *writefds,
-                  fd_set *exceptfds, struct timeval *timeout);
 
 int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *exceptfds, struct timeval *timeout)
 {
 	int result = 0;
 
-	errno = 0;
 //	printf( "%s\n", __func__);
+	errno = 0;
 	result = select( nfds, readfds, writefds, exceptfds, timeout);
 	if (result == SOCKET_ERROR)
 	{
@@ -217,14 +257,30 @@ int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
 	return result;
 }
 
+int socket_connect( int  sockfd,  const  struct sockaddr *serv_addr, socklen_t addrlen)
+{
+	int result = 0;
+
+	printf( "%s\n", __func__);
+	errno = 0;
+	if (connect( (SOCKET)sockfd, serv_addr, (int)addrlen) == SOCKET_ERROR)
+	{
+		errno = socket_errno();
+		result = -1;
+	}
+
+	return result;
+}
+
 int socket_close( int fd)
 {
 	int result = 0;
 
-//	printf( "%s\n", __func__);
-
+	printf( "%s\n", __func__);
+	errno = 0;
 	if (!CloseHandle( (HANDLE)fd))
 	{
+		errno = socket_errno();
 		result = -1;
 	}
 

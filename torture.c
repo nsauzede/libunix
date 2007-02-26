@@ -15,11 +15,18 @@ int main()
 	int n;
 	socklen_t len;
 
+	sock = socket( -666, -777, -888);
+	if (sock == -1)
+	{
+		perror( "socket");
+		result = -5;
+		goto nosock;
+	}
 	sock = socket( PF_INET, SOCK_STREAM, 0);
 	if (sock == -1)
 	{
 		perror( "socket");
-		result = -1;
+		result = -10;
 		goto nosock;
 	}
 	len = sizeof( sa);
@@ -30,7 +37,7 @@ int main()
 	if (connect( sock, (const struct sockaddr *)&sa, len) == -1)
 	{
 		perror( "connect");
-		result = -2;
+		result = -20;
 		goto nocon;
 	}
 	snprintf( buf, sizeof( buf), "test write\n");
