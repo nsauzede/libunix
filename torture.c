@@ -76,7 +76,7 @@ int main_no_net()
 	result--;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = p = pipe( fds);
-	if ((ret != _ret || errno != _err) && _ret < 0)
+	if ((ret != _ret || (errno != _err && errno != 120)) && _ret < 0)
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
