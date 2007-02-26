@@ -63,13 +63,12 @@ int unistd_read( int fd, void *buf, size_t count)
 	return result;
 }
 
-int unistd_write( int fd, void *buf, size_t count)
+int unistd_write( int fd, const void *buf, size_t count)
 {
 	int result = 0;
 	DWORD ret;
 
 //	printf( "%s\n", __func__);
-//	result = write( fd, buf, count);
 	WriteFile((HANDLE)fd,(LPCVOID)buf, (DWORD)count, &ret, NULL);
 	result = (int)ret;
 
@@ -81,7 +80,35 @@ int unistd_pipe( int filedes[2])
 	int result = 0;
 
 //	printf( "%s\n", __func__);
-	result = !CreatePipe((PHANDLE)&filedes[0], (PHANDLE)&filedes[1], NULL, 0);
+	errno = 0;
+	if (filedes)
+	{
+		if (!CreatePipe((PHANDLE)&filedes[0], (PHANDLE)&filedes[1], NULL, 0))
+		{
+			errno = EFAULT;
+			result = -1;
+		}
+	}
+	else
+	{
+		errno = EFAULT;
+		result = -1;
+	}
+
+	return result;
+}
+
+int unistd_close( int fd)
+{
+	int result = 0;
+
+//	printf( "%s\n", __func__);
+	errno = 0;
+	if (!CloseHandle( (HANDLE)fd))
+	{
+		errno = EBADF;
+		result = -1;
+	}
 
 	return result;
 }
@@ -130,14 +157,14 @@ char * string_strerror( int errnum)
 	printf( "%s : errnum=%d\n", __func__, errnum);fflush( stdout);
 	switch (errnum)
 	{
-		case -ECONNREFUSED:
+		case ECONNREFUSED:
 			result = "Connection refused";
 			break;
-		case -EAFNOSUPPORT:
+		case EAFNOSUPPORT:
 			result = "Address family not supported by protocol";
 			break;
 		default:
-			result = strerror( -errnum);
+			result = strerror( errnum);
 			break;
 	}
 
@@ -156,60 +183,60 @@ int socket_errno()
 
 //	printf( "socket_errno\n");fflush( stdout);
 	err = WSAGetLastError();
-	printf( "%s: err=%d\n", __func__, err);
+//	printf( "%s: err=%d\n", __func__, err);
 	switch (err)
 		{
 			case WSAEACCES:
-				_errno = -EACCES;
+				_errno = EACCES;
 				break;
 			case WSAEADDRINUSE:
-				_errno = -EADDRINUSE;
+				_errno = EADDRINUSE;
 				break;
 			case WSAEINTR:
-				_errno = -EINTR;
+				_errno = EINTR;
 				break;
 			case WSAEALREADY:
-				_errno = -EALREADY;
+				_errno = EALREADY;
 				break;
 			case WSAECONNREFUSED:
-				_errno = -ECONNREFUSED;
+				_errno = ECONNREFUSED;
 				break;
 			case WSAEFAULT:
-				_errno = -EFAULT;
+				_errno = EFAULT;
 				break;
 			case WSAEISCONN:
-				_errno = -EISCONN;
+				_errno = EISCONN;
 				break;
 			case WSAENETUNREACH:
-				_errno = -ENETUNREACH;
+				_errno = ENETUNREACH;
 				break;
 			case WSAESOCKTNOSUPPORT:
-				_errno = -EINVAL;
+				_errno = EINVAL;
 				break;
 			case WSAEPROTONOSUPPORT:
-				_errno = -EPROTONOSUPPORT;
+				_errno = EPROTONOSUPPORT;
 				break;
 			case WSAEAFNOSUPPORT:
-				_errno = -EAFNOSUPPORT;
+				_errno = EAFNOSUPPORT;
+				break;
+			case ERROR_INVALID_HANDLE:
+				_errno = EBADF;
 				break;
 				/*
 			case :
-				_errno = -;
-				break;
-			case :
-				_errno = -;
+				_errno = ;
 				break;
 				*/
 
 			case WSANOTINITIALISED:
 //				printf( "WSA not initialized !!\n");
 				compat_socket_init();
-				_errno = -EAGAIN;
+				_errno = EAGAIN;
 				break;
 
 			case WSAENOTSOCK:
 //				printf( "NOT SOCK!!!\n");fflush( stdout);
-				_errno = -ENOTSOCK;
+				_errno = ENOTSOCK;
 				break;
 			
 			case WSAENETDOWN:
@@ -226,7 +253,7 @@ int socket_errno()
 				_errno = 0;
 				break;
 		}
-	printf( "%s: err=%d returning %d\n", __func__, err, _errno);
+//	printf( "%s: err=%d returning %d\n", __func__, err, _errno);
 	return _errno;
 }
 
@@ -242,7 +269,7 @@ int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
 	{
 //		printf( "%s : error\n", __func__);fflush( stdout);
 		errno = socket_errno();
-		if (errno == -ENOTSOCK)
+		if (errno == ENOTSOCK)
 		{
 //			printf( "%s : calling unistd_select\n", __func__);fflush( stdout);
 			result = unistd_select( nfds, readfds, writefds, exceptfds, timeout);
@@ -264,7 +291,7 @@ int socket_connect( int  sockfd,  const  struct sockaddr *serv_addr, socklen_t a
 {
 	int result = 0;
 
-	printf( "%s\n", __func__);
+//	printf( "%s\n", __func__);
 	errno = 0;
 	if (connect( (SOCKET)sockfd, serv_addr, (int)addrlen) == SOCKET_ERROR)
 	{
@@ -279,12 +306,28 @@ int socket_close( int fd)
 {
 	int result = 0;
 
-	printf( "%s\n", __func__);
+//	printf( "%s\n", __func__);
 	errno = 0;
-	if (!CloseHandle( (HANDLE)fd))
+	if (shutdown( (SOCKET)fd, SD_SEND) != SOCKET_ERROR)
+	{
+		if (closesocket( (SOCKET)fd) == SOCKET_ERROR)
+		{
+			errno = socket_errno();
+			result = -1;
+		}
+	}
+	else
 	{
 		errno = socket_errno();
-		result = -1;
+		if (errno == ENOTSOCK)
+		{
+//			printf( "%s : calling unistd_close\n", __func__);fflush( stdout);
+			result = unistd_close( fd);
+		}
+		else
+		{
+			result = -1;
+		}
 	}
 
 	return result;
@@ -303,7 +346,7 @@ int socket_socket( int domain, int type, int protocol)
 		{
 //			printf( "compat_socket: invalid socket\n");fflush( stdout);
 			errno = socket_errno();
-			if (errno == -EAGAIN)
+			if (errno == EAGAIN)
 				continue;
 			result = -1;
 		}
@@ -315,7 +358,35 @@ int socket_socket( int domain, int type, int protocol)
 	}
 //	printf( "compat_socket finished\n");fflush( stdout);
 
-	return result;}
+	return result;
+}
+
+int socket_send( int fd, const void *buf, size_t count, int flags)
+{
+	int result = 0;
+
+//	printf( "%s\n", __func__);
+	errno = 0;
+	if (send( fd, buf, count, flags) == SOCKET_ERROR)
+	{
+		errno = socket_errno();
+		if (errno == ENOTSOCK)
+		{
+			result = unistd_write( fd, buf, count);
+		}
+		else
+			result = -1;
+	}
+
+	return result;
+}
+
+int socket_write( int fd, const void *buf, size_t count)
+{
+//	printf( "%s\n", __func__);
+
+	return socket_send( fd, buf, count, 0);
+}
 
 
 #endif

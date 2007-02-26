@@ -10,6 +10,13 @@
 #ifdef select
 #undef select
 #endif
+#ifdef close
+#undef close
+#endif
+#ifdef write
+#undef write
+#endif
+#define write socket_write
 #define select socket_select
 #define close socket_close
 #define socket socket_socket
@@ -28,6 +35,7 @@ extern int socket_socket(int domain, int type, int protocol);
 extern int socket_connect( int  sockfd,  const  struct sockaddr *serv_addr, socklen_t addrlen);
 extern char * string_strerror( int errnum);
 extern void stdio_perror( const char *s);
+extern int socket_write( int fd, const void *buf, size_t count);
 
 #endif
 

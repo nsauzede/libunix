@@ -12,20 +12,26 @@
 #ifndef NO_COMPAT_UNISTD
 
 #define read unistd_read
+#ifndef write
 #define write unistd_write
+#endif
 #define pipe unistd_pipe
+#ifndef close
+#define close unistd_close
+#endif
 
 #else
 
 extern int read( int fd, void *buf, size_t count);
-extern int write( int fd, void *buf, size_t count);
+extern int write( int fd, const void *buf, size_t count);
 
 #endif
 
 extern int unistd_read( int fd, void *buf, size_t count);
-extern int unistd_write( int fd, void *buf, size_t count);
+extern int unistd_write( int fd, const void *buf, size_t count);
 
 extern int unistd_pipe( int filedes[2]);
+extern int unistd_close( int fd);
 
 #endif
 
