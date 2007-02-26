@@ -18,13 +18,14 @@
 #ifdef write
 #undef write
 #endif
+
 #define write socket_write
 #define select socket_select
 #define close socket_close
+
 #define socket socket_socket
 #define connect socket_connect
-#define strerror string_strerror
-#define perror stdio_perror
+#define setsockopt socket_setsockopt
 
 #endif
 
@@ -35,9 +36,8 @@ extern int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *exceptfds, struct timeval *timeout);
 extern int socket_socket(int domain, int type, int protocol);
 extern int socket_connect( int  sockfd,  const  struct sockaddr *serv_addr, socklen_t addrlen);
-extern char * string_strerror( int errnum);
-extern void stdio_perror( const char *s);
 extern int socket_write( int fd, const void *buf, size_t count);
+extern int socket_setsockopt( int fd, int  level,  int  optname,  const  void  *optval,socklen_t optlen);
 
 #endif
 

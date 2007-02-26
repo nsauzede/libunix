@@ -7,16 +7,21 @@
 #define NO_COMPAT_UNISTD
 #undef NO_COMPAT_UNISTD
 
+#define NO_COMPAT_ERRNO
 #define NO_COMPAT_SELECT
 #include "unistd.h"
 #include "sys/select.h"
 #undef NO_COMPAT_SELECT
+#include "compat_errno.h"
+#undef NO_COMPAT_ERRNO
 
 #define NO_COMPAT_SOCKET
 #include "sys/socket.h"
 #undef NO_COMPAT_SOCKET
 
-#include "compat_errno.h"
+#if defined(strerror)||defined(socket)||defined(connect)||defined(send)||defined(strerror)
+#error "Somebody f*cked up headers"
+#endif
 
 int unistd_select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *exceptfds, struct timeval *timeout)
@@ -154,20 +159,30 @@ int compat_socket_init()
 	return result;
 }
 
-char * string_strerror( int errnum)
+char * string_strerror( compat_errno errnum)
 {
 	char *result;
 
-	printf( "%s : errnum=%d\n", __func__, errnum);fflush( stdout);
+//	printf( "%s : errnum=%d\n", __func__, errnum);fflush( stdout);
 	switch (errnum)
 	{
-		case ECONNREFUSED:
-			result = "Connection refused";
-			break;
-		case EAFNOSUPPORT:
-			result = "Address family not supported by protocol";
-			break;
+		case ECONNREFUSED:result = MCONNREFUSED;break;
+		case EAFNOSUPPORT:result = MAFNOSUPPORT;break;
+		case ENOTSOCK:result = MNOTSOCK;break;
+		case ENOPROTOOPT:result = MNOPROTOOPT;break;
+		case EPROTONOSUPPORT:result = MPROTONOSUPPORT;break;
+		case ESOCKTNOSUPPORT:result = MSOCKTNOSUPPORT;break;
+		case EADDRINUSE:result = MADDRINUSE;break;
+		case ENETUNREACH:result = MNETUNREACH;break;
+		case EISCONN:result = MISCONN;break;
+		case EALREADY:result = MALREADY;break;
+
+#if 0
+		case ENONE:
+#else
 		default:
+#endif
+			printf( "[%s : handing %d to _strerror] ", __func__, errnum);fflush( stdout);
 			result = strerror( errnum);
 			break;
 	}
@@ -187,7 +202,7 @@ int socket_errno()
 
 //	printf( "socket_errno\n");fflush( stdout);
 	err = WSAGetLastError();
-//	printf( "%s: err=%d\n", __func__, err);
+	printf( "%s: err=%d\n", __func__, err);
 	switch (err)
 		{
 			case WSAEACCES:
@@ -226,11 +241,9 @@ int socket_errno()
 			case ERROR_INVALID_HANDLE:
 				_errno = EBADF;
 				break;
-				/*
-			case :
-				_errno = ;
+			case WSAEINVAL:
+				_errno = EINVAL;
 				break;
-				*/
 
 			case WSANOTINITIALISED:
 //				printf( "WSA not initialized !!\n");
@@ -246,7 +259,6 @@ int socket_errno()
 			case WSAENETDOWN:
 			case WSAEINPROGRESS:
 			case WSAEADDRNOTAVAIL:
-			case WSAEINVAL:
 			case WSAEHOSTUNREACH:
 			case WSAENOBUFS:
 			case WSAETIMEDOUT:
@@ -390,6 +402,21 @@ int socket_write( int fd, const void *buf, size_t count)
 //	printf( "%s\n", __func__);
 
 	return socket_send( fd, buf, count, 0);
+}
+
+int socket_setsockopt( int fd, int  level,  int  optname,  const  void  *optval,socklen_t optlen)
+{
+	int result = 0;
+
+//	printf( "%s\n", __func__);
+	errno = 0;
+	if (setsockopt( fd, level, optname, optval, optlen) == SOCKET_ERROR)
+	{
+		errno = socket_errno();
+		result = -1;
+	}
+
+	return result;
 }
 
 

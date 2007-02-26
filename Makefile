@@ -27,7 +27,7 @@ EXT=
 TARGET2= bummer
 endif
 
-TARGET += test$(EXT) pipe$(EXT) torture$(EXT)
+TARGET += test$(EXT) pipe$(EXT) torture$(EXT) err$(EXT)
 
 CFLAGS+=	-Wall -Werror -g -O0
 #CFLAGS+=-m32
@@ -72,6 +72,9 @@ pipe$(EXT): pipe.c $(LIB)
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
 torture$(EXT): torture.c $(LIB)
+	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
+
+err$(EXT): err.c $(LIB)
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
 clean:
