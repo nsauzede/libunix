@@ -170,7 +170,7 @@ int main_net()
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, -777, 0);
-	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
+	if (((ret != _ret || (errno != _err && errno != EPROTONOSUPPORT)) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
@@ -180,14 +180,13 @@ int main_net()
 	{
 		printf( "SUCCESS : %s : ret=%d errno=%d\n", func, ret, _err);fflush( stdout);
 	}
-//	_err = EAFNOSUPPORT;
 	_err = EPROTONOSUPPORT;
 	_ret = -1;
 	func = "socket";		// should fail
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
 	ret = sock = socket( PF_INET, SOCK_STREAM, -666);
-	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
+	if (((ret != _ret || (errno != _err && errno != ESOCKTNOSUPPORT)) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d (should be %d) errno=%d (should be %d)\n", ret, _ret, errno, _err);
 		perror( func);
