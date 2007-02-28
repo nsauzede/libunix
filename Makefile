@@ -40,7 +40,7 @@ THREADF=
 ifdef WIN32
 #LDFLAGS+= -L. -Wl,--whole-archive -lsocket -Wl,--no-whole-archive -lwsock32
 LDFLAGS+= -L$(LIBUNIX) $(LIBF) -lws2_32
-CFLAGS+= -I./include
+CFLAGS+= -I$(LIBUNIX)/include
 #CFLAGS+= -mno-cygwin
 INSTALL= install
 else

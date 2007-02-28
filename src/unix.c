@@ -23,6 +23,8 @@
 #error "Somebody f*cked up headers"
 #endif
 
+int h_errno;
+
 int unistd_select(int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *exceptfds, struct timeval *timeout)
 {
@@ -175,6 +177,7 @@ char * string_strerror( compat_errno errnum)
 		case EADDRINUSE:result = MADDRINUSE;break;
 		case ENETUNREACH:result = MNETUNREACH;break;
 		case EISCONN:result = MISCONN;break;
+		case ETIMEDOUT:result = MTIMEDOUT;break;
 		case EALREADY:result = MALREADY;break;
 
 #if 0

@@ -5,18 +5,6 @@
 
 #include <errno.h>
 
-#if 0
-#define ENOTSOCK		88		/* fd not a socket */
-#define ENOPROTOOPT 	92      /* Protocol not supported */
-#define EPROTONOSUPPORT 93      /* Protocol not supported */
-#define ESOCKTNOSUPPORT 94      /* Protocol not supported */
-#define EAFNOSUPPORT    97  	/* Address family not supported by protocol */
-#define EADDRINUSE      98      /* Address already in use */
-#define ENETUNREACH     101     /* Network is unreachable */
-#define EISCONN         106     /* Transport endpoint is already connected */
-#define ECONNREFUSED    111     /* Connection refused */
-#define EALREADY        114     /* Operation already in progress */
-#else
 typedef enum {
 	ENONE=		-1,
 ENOTSOCK=		88,		/* Socket operation on non-socket */
@@ -27,10 +15,10 @@ ENOTSOCK=		88,		/* Socket operation on non-socket */
  EADDRINUSE    = 98 ,    /* Address already in use */
  ENETUNREACH   = 101,    /* Network is unreachable */
  EISCONN       = 106,    /* Transport endpoint is already connected */
+ ETIMEDOUT     = 110,     /* Connection timed out */
 ECONNREFUSED   =111,    /* Connection refused */
 EALREADY  =     114 ,   /* Operation already in progress */
 } compat_errno;
-#endif
 
 #define MNOTSOCK		"Socket operation on non-socket"
 #define MNOPROTOOPT		"Protocol not available"
@@ -40,6 +28,7 @@ EALREADY  =     114 ,   /* Operation already in progress */
 #define MADDRINUSE		"Address already in use"
 #define MNETUNREACH		"Network is unreachable"
 #define MISCONN			"Transport endpoint is already connected"
+#define MTIMEDOUT		"Connection timed out"
 #define MCONNREFUSED	"Connection refused"
 #define MALREADY		"Operation already in progress"
 
@@ -51,6 +40,8 @@ EALREADY  =     114 ,   /* Operation already in progress */
 //extern char * string_strerror( int errnum);
 extern char * string_strerror( compat_errno errnum);
 extern void stdio_perror( const char *s);
+
+extern int h_errno;
 
 #endif
 
