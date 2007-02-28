@@ -60,9 +60,8 @@ int unistd_read( int fd, void *buf, size_t count)
 	int result = 0;
 	DWORD ret;
 
-//	printf( "%s\n", __func__);
-//	result = read( fd, buf, count);
-	ReadFile((HANDLE)fd,(LPVOID)buf, (DWORD)count, &ret, NULL);
+	printf( "%s\n", __func__);
+	ReadFile( (HANDLE)fd,(LPVOID)buf, (DWORD)count, &ret, NULL);
 	result = (int)ret;
 
 	return result;
@@ -73,8 +72,8 @@ int unistd_write( int fd, const void *buf, size_t count)
 	int result = 0;
 	DWORD ret;
 
-//	printf( "%s\n", __func__);
-	WriteFile((HANDLE)fd,(LPCVOID)buf, (DWORD)count, &ret, NULL);
+	printf( "%s\n", __func__);
+	WriteFile( (HANDLE)fd,(LPCVOID)buf, (DWORD)count, &ret, NULL);
 	result = (int)ret;
 
 	return result;
@@ -185,7 +184,7 @@ char * string_strerror( compat_errno errnum)
 #else
 		default:
 #endif
-			printf( "[%s : handing %d to _strerror] ", __func__, errnum);fflush( stdout);
+//			printf( "[%s : handing %d to _strerror] ", __func__, errnum);fflush( stdout);
 			result = strerror( errnum);
 			break;
 	}
@@ -195,7 +194,7 @@ char * string_strerror( compat_errno errnum)
 
 void stdio_perror( const char *s)
 {
-	printf( "%s\n", __func__);fflush( stdout);
+//	printf( "%s\n", __func__);fflush( stdout);
 	printf( "%s: %s\n", s, string_strerror( errno));
 }
 
@@ -205,7 +204,7 @@ int socket_errno()
 
 //	printf( "socket_errno\n");fflush( stdout);
 	err = WSAGetLastError();
-	printf( "%s: err=%d\n", __func__, err);
+//	printf( "%s: err=%d\n", __func__, err);
 	switch (err)
 		{
 			case WSAEACCES:
@@ -222,6 +221,9 @@ int socket_errno()
 				break;
 			case WSAECONNREFUSED:
 				_errno = ECONNREFUSED;
+				break;
+			case WSAENOTCONN:
+				_errno = ENOTCONN;
 				break;
 			case WSAEFAULT:
 				_errno = EFAULT;
@@ -247,11 +249,14 @@ int socket_errno()
 			case WSAEINVAL:
 				_errno = EINVAL;
 				break;
+			case WSAECONNRESET:
+				_errno = ECONNRESET;
+				break;
 
 			case WSANOTINITIALISED:
 //				printf( "WSA not initialized !!\n");
 				compat_socket_init();
-				_errno = EAGAIN;
+				_errno = ENOTSOCK;
 				break;
 
 			case WSAENOTSOCK:
@@ -280,14 +285,20 @@ int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
                   fd_set *exceptfds, struct timeval *timeout)
 {
 	int result = 0;
+	struct timeval tv, *ptv = NULL;
 
 //	printf( "%s\n", __func__);
 	errno = 0;
-	result = select( nfds, readfds, writefds, exceptfds, timeout);
+	if (timeout)
+	{
+		ptv = &tv;
+		memcpy( ptv, timeout, sizeof( tv));
+	}
+	result = select( nfds, readfds, writefds, exceptfds, ptv);
 	if (result == SOCKET_ERROR)
 	{
-//		printf( "%s : error\n", __func__);fflush( stdout);
 		errno = socket_errno();
+//		printf( "%s : error errno=%d nfds=%d\n", __func__, errno, nfds);fflush( stdout);
 		if (errno == ENOTSOCK)
 		{
 //			printf( "%s : calling unistd_select\n", __func__);fflush( stdout);
@@ -365,7 +376,7 @@ int socket_socket( int domain, int type, int protocol)
 		{
 //			printf( "compat_socket: invalid socket\n");fflush( stdout);
 			errno = socket_errno();
-			if (errno == EAGAIN)
+			if (errno == ENOTSOCK)
 				continue;
 			result = -1;
 		}
@@ -384,9 +395,9 @@ int socket_send( int fd, const void *buf, size_t count, int flags)
 {
 	int result = 0;
 
-//	printf( "%s\n", __func__);
+	printf( "%s\n", __func__);
 	errno = 0;
-	if (send( fd, buf, count, flags) == SOCKET_ERROR)
+	if ((result = send( fd, buf, count, flags)) == SOCKET_ERROR)
 	{
 		errno = socket_errno();
 		if (errno == ENOTSOCK)
@@ -411,15 +422,17 @@ int socket_recv( int fd, void *buf, size_t count, int flags)
 {
 	int result = 0;
 
-//	printf( "%s\n", __func__);
+	printf( "%s\n", __func__);
 	errno = 0;
-	if (recv( fd, buf, count, flags) == SOCKET_ERROR)
+	if ((result = recv( fd, buf, count, flags)) == SOCKET_ERROR)
 	{
 		errno = socket_errno();
 		if (errno == ENOTSOCK)
 		{
 			result = unistd_read( fd, buf, count);
 		}
+		else if (errno == ECONNRESET)
+			result = 0;
 		else
 			result = -1;
 	}

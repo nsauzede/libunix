@@ -7,6 +7,7 @@
 
 typedef enum {
  ENONE			= -1,
+
  ENOTSOCK		= 88,		/* Socket operation on non-socket */
  ENOPROTOOPT	= 92    , /* Protocol not available */
  EPROTONOSUPPORT= 93 ,    /* Protocol not supported */
@@ -14,6 +15,8 @@ typedef enum {
  EAFNOSUPPORT  	= 97 ,	/* Address family not supported by protocol */
  EADDRINUSE    	= 98 ,    /* Address already in use */
  ENETUNREACH   	= 101,    /* Network is unreachable */
+ ECONNRESET   	= 104,    /* Connection reset by peer */
+ ENOTCONN   	= 107,    /* Transport endpoint is not connected */
  EISCONN       	= 106,    /* Transport endpoint is already connected */
  ETIMEDOUT     	= 110,     /* Connection timed out */
  ECONNREFUSED   = 111,    /* Connection refused */

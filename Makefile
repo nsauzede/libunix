@@ -22,9 +22,13 @@ TARGET=
 ifdef WIN32
 TARGET+=	libunix.a
 EXT=.exe
+LIB=	libunix.a
+LIBF=	-lunix
 else
 EXT=
 TARGET2= bummer
+LIB=
+LIBF=
 endif
 
 TARGET += test$(EXT) pipe$(EXT) torture$(EXT) err$(EXT)
@@ -32,9 +36,6 @@ TARGET += test$(EXT) pipe$(EXT) torture$(EXT) err$(EXT)
 CFLAGS+=	-Wall -Werror -g -O0
 #CFLAGS+=-m32
 #LDFLAGS=	-m32
-
-LIB=	libunix.a
-LIBF=	-lunix
 
 THREADF=
 ifdef WIN32

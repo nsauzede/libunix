@@ -240,7 +240,15 @@ int main()
 		snprintf( buf, sizeof( buf), "hello pipe\n");
 		n = strlen( buf);
 		printf( "About to write %d bytes to pipe..\n", n);fflush( stdout);
-		write( pfd[WRITE], buf, n);
+		do {
+		n = write( pfd[WRITE], buf, n);
+		if (n > 0)
+		{
+			printf( "wrote %d bytes\n", n);fflush( stdout);
+		}
+		else
+			perror( "write");
+		} while (n < 0);
 	}
 	for (i = 0; i < LOOPS; i++)
 	{

@@ -69,10 +69,11 @@ inline int pthread_join( pthread_t tid, void **ptr)
 	else
 		prc = &rc;
 //	printf( "About to GetExitCodeThread tid=%08lx\n", (DWORD)tid);
-	while (ret && *prc == STILL_ACTIVE)
+	do
 	{
 		ret = GetExitCodeThread( (HANDLE)tid, prc);
 	}
+	while (ret && *prc == STILL_ACTIVE);
 //	printf( "ret=%d\n", ret);
 	if (!ret)
 	{
