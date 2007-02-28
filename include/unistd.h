@@ -12,7 +12,9 @@
 
 #ifndef NO_COMPAT_UNISTD
 
+#ifndef read
 #define read unistd_read
+#endif
 #ifndef write
 #define write unistd_write
 #endif

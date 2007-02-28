@@ -19,8 +19,8 @@
 #include "sys/socket.h"
 #undef NO_COMPAT_SOCKET
 
-#if defined(strerror)||defined(socket)||defined(connect)||defined(send)||defined(strerror)
-#error "Somebody f*cked up headers"
+#if defined(strerror)||defined(socket)||defined(connect)||defined(send)||defined(recv)||defined(strerror)
+#error "Something scrapped the headers"
 #endif
 
 int unistd_select(int nfds, fd_set *readfds, fd_set *writefds,
@@ -128,12 +128,14 @@ void unistd_FD_SET( int fd, fd_set *set)
 		FD_SET( fd, set);
 }
 
+/*
 int unistd_WSAStartup( WORD wVersionRequested, LPWSADATA lpWSAData)
 {
 	int result = 0;
 
 	return result;
 }
+*/
 
 int compat_socket_init()
 {
@@ -403,6 +405,33 @@ int socket_write( int fd, const void *buf, size_t count)
 //	printf( "%s\n", __func__);
 
 	return socket_send( fd, buf, count, 0);
+}
+
+int socket_recv( int fd, void *buf, size_t count, int flags)
+{
+	int result = 0;
+
+//	printf( "%s\n", __func__);
+	errno = 0;
+	if (recv( fd, buf, count, flags) == SOCKET_ERROR)
+	{
+		errno = socket_errno();
+		if (errno == ENOTSOCK)
+		{
+			result = unistd_read( fd, buf, count);
+		}
+		else
+			result = -1;
+	}
+
+	return result;
+}
+
+int socket_read( int fd, void *buf, size_t count)
+{
+//	printf( "%s\n", __func__);
+
+	return socket_recv( fd, buf, count, 0);
 }
 
 int socket_setsockopt( int fd, int  level,  int  optname,  const  void  *optval,socklen_t optlen)

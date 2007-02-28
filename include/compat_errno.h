@@ -6,18 +6,18 @@
 #include <errno.h>
 
 typedef enum {
-	ENONE=		-1,
-ENOTSOCK=		88,		/* Socket operation on non-socket */
- ENOPROTOOPT =92    , /* Protocol not available */
- EPROTONOSUPPORT=93 ,    /* Protocol not supported */
- ESOCKTNOSUPPORT=94 ,    /* Socket type not supported */
- EAFNOSUPPORT  = 97 ,	/* Address family not supported by protocol */
- EADDRINUSE    = 98 ,    /* Address already in use */
- ENETUNREACH   = 101,    /* Network is unreachable */
- EISCONN       = 106,    /* Transport endpoint is already connected */
- ETIMEDOUT     = 110,     /* Connection timed out */
-ECONNREFUSED   =111,    /* Connection refused */
-EALREADY  =     114 ,   /* Operation already in progress */
+ ENONE			= -1,
+ ENOTSOCK		= 88,		/* Socket operation on non-socket */
+ ENOPROTOOPT	= 92    , /* Protocol not available */
+ EPROTONOSUPPORT= 93 ,    /* Protocol not supported */
+ ESOCKTNOSUPPORT= 94 ,    /* Socket type not supported */
+ EAFNOSUPPORT  	= 97 ,	/* Address family not supported by protocol */
+ EADDRINUSE    	= 98 ,    /* Address already in use */
+ ENETUNREACH   	= 101,    /* Network is unreachable */
+ EISCONN       	= 106,    /* Transport endpoint is already connected */
+ ETIMEDOUT     	= 110,     /* Connection timed out */
+ ECONNREFUSED   = 111,    /* Connection refused */
+ EALREADY  		= 114 ,   /* Operation already in progress */
 } compat_errno;
 
 #define MNOTSOCK		"Socket operation on non-socket"

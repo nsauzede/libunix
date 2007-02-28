@@ -18,8 +18,12 @@
 #ifdef write
 #undef write
 #endif
+#ifdef read
+#undef read
+#endif
 
 #define write socket_write
+#define read socket_read
 #define select socket_select
 #define close socket_close
 
@@ -37,6 +41,7 @@ extern int socket_select( int nfds, fd_set *readfds, fd_set *writefds,
 extern int socket_socket(int domain, int type, int protocol);
 extern int socket_connect( int  sockfd,  const  struct sockaddr *serv_addr, socklen_t addrlen);
 extern int socket_write( int fd, const void *buf, size_t count);
+extern int socket_read( int fd, void *buf, size_t count);
 extern int socket_setsockopt( int fd, int  level,  int  optname,  const  void  *optval,socklen_t optlen);
 
 #endif
