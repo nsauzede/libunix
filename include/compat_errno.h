@@ -1,7 +1,9 @@
 #ifndef COMPAT_ERRNO_H
 #define COMPAT_ERRNO_H
 
-#ifdef WIN32
+#ifndef WIN32
+#error -= Use libunix.a on Win32 platforms only =-
+#else
 
 #include <errno.h>
 

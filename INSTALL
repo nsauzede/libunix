@@ -1,0 +1,19 @@
+BUILD
+-----
+
+make clean all
+
+=> generates libsocket.a
+=> necessary headers are in include/
+CFLAGS+= -I./include
+LDFLAGS+= -L./ -lsocket -lws2_32
+
+TEST
+----
+
+There is a simple test to exercise the APIs (can be compiled also on linux & unix)
+
+cd test
+
+=> read README
+

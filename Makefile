@@ -31,7 +31,7 @@ LIB=
 LIBF=
 endif
 
-TARGET += test$(EXT) pipe$(EXT) torture$(EXT) err$(EXT)
+TARGET += test$(EXT) pipe$(EXT) torture$(EXT) err$(EXT) misc$(EXT)
 
 CFLAGS+=	-Wall -Werror -g -O0
 #CFLAGS+=-m32
@@ -65,6 +65,9 @@ libunix.o: src/unix.c include/unistd.h include/sys/socket.h
 
 $(LIB): libunix.o
 	$(AR) cru $@ $^
+
+misc$(EXT): misc.c $(LIB)
+	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)
 
 test$(EXT): test.c $(LIB)
 	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS)

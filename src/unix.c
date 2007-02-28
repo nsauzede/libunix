@@ -1,4 +1,6 @@
-#ifdef WIN32
+#ifndef WIN32
+#error -= Use libunix.a on Win32 platforms only =-
+#else
 
 #include <windows.h>
 #include <winsock2.h>
@@ -23,8 +25,9 @@
 #error "Something scrapped the headers"
 #endif
 
-int unistd_select(int nfds, fd_set *readfds, fd_set *writefds,
-                  fd_set *exceptfds, struct timeval *timeout)
+/* operates on pipes only for now 
+ * works only on readfds for now */
+int unistd_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
 	DWORD dw, to;
 	HANDLE h;
@@ -33,23 +36,35 @@ int unistd_select(int nfds, fd_set *readfds, fd_set *writefds,
 	errno = 0;
 //	printf( "%s..\n", __func__);fflush( stdout);
 	to = timeout ? timeout->tv_sec * 1000 + timeout->tv_usec / 1000 : INFINITE;
-	ret = 0;
-	n = readfds->fd_count - 1;
 //	printf( "about to loop n=%d\n", n);fflush( stdout);
-	for (i = n; i >= 0; i--)
+	while (1)
 	{
-//		printf( "about to fake read h=%d to=%lu\n", (int)h, to);fflush( stdout);
-		h = (HANDLE)readfds->fd_array[0];
-		dw = PIPE_NOWAIT;
-		SetNamedPipeHandleState( h, &dw, NULL, NULL);
-		flag = ReadFile(h,&dw,0,&dw,NULL);
-		dw = 0;
-		SetNamedPipeHandleState( h, &dw, NULL, NULL);
-//		printf( "fake read returned %d dwread=%08lx\n", ret, dw);fflush(stdout);
-		if (flag)
-			ret++;
-		else
-			FD_CLR( (int)h, readfds);
+		n = readfds->fd_count - 1;
+		ret = 0;
+		for (i = n; i >= 0; i--)
+		{
+//			printf( "about to fake read h=%d to=%lu\n", (int)h, to);fflush( stdout);
+			h = (HANDLE)readfds->fd_array[0];
+			dw = PIPE_NOWAIT;
+			SetNamedPipeHandleState( h, &dw, NULL, NULL);
+			flag = ReadFile(h,&dw,0,&dw,NULL);
+			dw = 0;
+			SetNamedPipeHandleState( h, &dw, NULL, NULL);
+//			printf( "fake read returned %d dwread=%08lx\n", ret, dw);fflush(stdout);
+			if (flag)
+			{
+				ret++;
+				FD_SET( (int)h, readfds);
+			}
+			else
+				FD_CLR( (int)h, readfds);
+		}
+		if (ret > 0)
+			break;
+		if (to == INFINITE)
+			continue;
+		Sleep( to);
+		break;
 	}
 
 	return ret;
@@ -60,7 +75,7 @@ int unistd_read( int fd, void *buf, size_t count)
 	int result = 0;
 	DWORD ret;
 
-	printf( "%s\n", __func__);
+//	printf( "%s\n", __func__);
 	ReadFile( (HANDLE)fd,(LPVOID)buf, (DWORD)count, &ret, NULL);
 	result = (int)ret;
 
@@ -72,7 +87,7 @@ int unistd_write( int fd, const void *buf, size_t count)
 	int result = 0;
 	DWORD ret;
 
-	printf( "%s\n", __func__);
+//	printf( "%s\n", __func__);
 	WriteFile( (HANDLE)fd,(LPCVOID)buf, (DWORD)count, &ret, NULL);
 	result = (int)ret;
 
@@ -395,7 +410,7 @@ int socket_send( int fd, const void *buf, size_t count, int flags)
 {
 	int result = 0;
 
-	printf( "%s\n", __func__);
+//	printf( "%s\n", __func__);
 	errno = 0;
 	if ((result = send( fd, buf, count, flags)) == SOCKET_ERROR)
 	{
@@ -422,7 +437,7 @@ int socket_recv( int fd, void *buf, size_t count, int flags)
 {
 	int result = 0;
 
-	printf( "%s\n", __func__);
+//	printf( "%s\n", __func__);
 	errno = 0;
 	if ((result = recv( fd, buf, count, flags)) == SOCKET_ERROR)
 	{

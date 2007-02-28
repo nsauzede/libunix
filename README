@@ -1,0 +1,26 @@
+Minimal unix API compatibility library for win32 : libunix.a
+N.Sauzede 2007.
+
+Purpose
+=======
+Provide a minimal set of unix-compatible primitives (sockets, pthreads, mutexes, pipes, ...) to native win32 applications compiled with Mingw32.
+Much of the missing APIs are wrapping native win32 primitives (winsock functions, CreateThread, CreateMutex, etc...)
+
+Tests
+====
+
+test : tests sockets, pthreads and pipes (select)
+pipe : tests pthreads and pipes (select)
+torture : exercises various error codes
+err : given errno, quickly returns corresponding strerror(errno)
+misc : tests miscellaneous things : sleep
+
+Note
+----
+There is a minor inconsistency with pthread_self() and pthread_t;
+Current implementation differs from POSIX in that threadid in win32 are different
+between caller and callee.
+This is because caller gets a handle to the thread, and callee can only get its thread id.
+So one can't compare directly caller's handle and callee's pthread_self()'s result.
+This is a minor bug, though.
+

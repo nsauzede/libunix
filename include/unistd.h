@@ -9,6 +9,7 @@
 #include "sys/select.h"
 
 #define usleep(t) Sleep(t / 1000)
+#define sleep(t) _sleep(t * 1000)
 
 #ifndef NO_COMPAT_UNISTD
 
