@@ -41,8 +41,6 @@ EALREADY  =     114 ,   /* Operation already in progress */
 extern char * string_strerror( compat_errno errnum);
 extern void stdio_perror( const char *s);
 
-extern int h_errno;
-
 #endif
 
 #endif
