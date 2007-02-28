@@ -1,10 +1,24 @@
-Minimal unix API compatibility library for win32 : libunix.a
-N.Sauzede 2007.
+						    libunix
+
+						version 0.1pre
+
+--
+Minimal unix API compatibility library for win32
+This library is distributed under the GNU LGPL version 2.1, which can be found
+in the file "COPYING".
+This license allows you to use libunix freely in commercial programs as long as
+you link with the dynamic library.
+Refer to the file "INSTALL" for build instructions.
+
+N.Sauzede 2007
 
 Purpose
 =======
-Provide a minimal set of unix-compatible primitives (sockets, pthreads, mutexes, pipes, ...) to native win32 applications compiled with Mingw32.
-Much of the missing APIs are wrapping native win32 primitives (winsock functions, CreateThread, CreateMutex, etc...)
+Provide a minimal set of unix-compatible primitives 
+(sockets, pthreads, mutexes, pipes, ...)
+to native win32 applications compiled with Mingw32.
+Much of the missing APIs are wrapping native win32 primitives 
+(winsock functions, CreateThread, CreateMutex, etc...)
 
 Tests
 ====
