@@ -126,6 +126,7 @@ int main_net()
 	int result = 0;
 	int sock;
 	struct sockaddr_in sa;
+	int port;
 	char buf[100];
 	int n;
 	socklen_t len;
@@ -289,7 +290,7 @@ int main_net()
 	len = sizeof( sa);
 	memset( &sa, 0, len);
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons( 65534);		// should not exist
+	sa.sin_port = htons( port = 65534);		// should not exist
 	sa.sin_addr.s_addr = inet_addr( "127.0.0.1");
 	_err = ECONNREFUSED;
 	_ret = -1;
@@ -301,6 +302,7 @@ int main_net()
 	{
 		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
+		printf( "*** There should NOT be any listening socket on localhost port %d ***\n", port);
 		goto err;
 	}
 	else
@@ -308,7 +310,7 @@ int main_net()
 		printf( "SUCCESS : %s : ret=%d errno=%d (%s)\n", func, ret, _err, strerror( _err));fflush( stdout);
 	}
 	sa.sin_family = AF_INET;
-	sa.sin_port = htons( 30000);		// should exist
+	sa.sin_port = htons( port = 30000);		// should exist
 	sa.sin_addr.s_addr = inet_addr( "127.0.0.1");
 	_err = 0;
 	_ret = 0;
@@ -320,6 +322,7 @@ int main_net()
 	{
 		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
+		printf( "*** There should be some listening socket on localhost port %d ***\n", port);
 		goto err;
 	}
 	else

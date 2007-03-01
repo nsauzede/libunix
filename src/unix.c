@@ -505,6 +505,9 @@ int socket_setsockopt( int fd, int  level,  int  optname,  const  void  *optval,
 	if (setsockopt( fd, level, optname, optval, optlen) == SOCKET_ERROR)
 	{
 		errno = socket_errno();
+//		printf( "%s: got socket_errno %d EINVAL=%d ENOPROTOOPT %d\n", __func__, errno, EINVAL, ENOPROTOOPT);
+		if (errno == EINVAL)
+			errno = ENOPROTOOPT;
 		result = -1;
 	}
 
