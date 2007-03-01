@@ -46,7 +46,7 @@ int main_no_net()
 	ret = p = pipe( NULL);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -63,7 +63,7 @@ int main_no_net()
 	ret = close( -666);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -79,7 +79,7 @@ int main_no_net()
 	ret = p = pipe( fds);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -96,7 +96,7 @@ int main_no_net()
 	ret = close( p);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -141,7 +141,7 @@ int main_net()
 	ret = sock = socket( -666, SOCK_STREAM, 0);
 	if (((ret != _ret || (errno != _err && errno != EPROTONOSUPPORT)) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -157,7 +157,7 @@ int main_net()
 	ret = close( sock);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -173,7 +173,7 @@ int main_net()
 	ret = sock = socket( PF_INET, -777, 0);
 	if (((ret != _ret || (errno != _err && errno != EPROTONOSUPPORT)) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -189,7 +189,7 @@ int main_net()
 	ret = sock = socket( PF_INET, SOCK_STREAM, -666);
 	if (((ret != _ret || (errno != _err && errno != ESOCKTNOSUPPORT)) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -205,7 +205,7 @@ int main_net()
 	ret = sock = socket( PF_INET, SOCK_STREAM, 0);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -223,7 +223,7 @@ int main_net()
 	ret = setsockopt( -666, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
 	if (((ret != _ret || (errno != _err && errno != ENOTSOCK)) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -241,7 +241,7 @@ int main_net()
 	ret = setsockopt( 0, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -259,7 +259,7 @@ int main_net()
 	ret = setsockopt( sock, -666, SO_LINGER, (const void *)&on, sizeof( on));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -277,7 +277,7 @@ int main_net()
 	ret = setsockopt( sock, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -299,7 +299,7 @@ int main_net()
 	ret = connect( sock, (const struct sockaddr *)&sa, len);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -318,7 +318,7 @@ int main_net()
 	ret = connect( sock, (const struct sockaddr *)&sa, len);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -335,7 +335,7 @@ int main_net()
 	n = write( sock, buf, strlen( buf));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -352,7 +352,7 @@ int main_net()
 	n = send( sock, buf, strlen( buf), 0);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
@@ -371,7 +371,7 @@ int main_net()
 	ret = close( sock);
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
-		printf( "FAIL : ret=%d, should be %d; errno=%d, should be %d (%s)\n", ret, _ret, errno, _err, strerror( _err));
+		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
 		perror( func);
 		goto err;
 	}
