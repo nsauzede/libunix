@@ -25,13 +25,33 @@
 #error "Something scrapped the headers"
 #endif
 
+int unistd_FD_ISPIPE( int fd)
+{
+	int result = 0;
+
+	if (GetNamedPipeInfo((HANDLE)fd,NULL,NULL,NULL,NULL))
+		result = 1;
+
+	return result;
+}
+
+int unistd_FD_ISSOCKET( int fd)
+{
+	int result = 0;
+
+	if (WSADuplicateSocket((SOCKET)fd,0,NULL) == SOCKET_ERROR)
+		if (WSAGetLastError() == WSAEINVAL)
+			result = 1;
+
+	return result;
+}
+
 /* operates on pipes only for now 
  * works only on readfds for now */
 int unistd_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds, struct timeval *timeout)
 {
-	DWORD dw, to;
-	HANDLE h;
-	int ret, flag, i, n;
+	DWORD to;
+	int ret;
 
 	errno = 0;
 //	printf( "%s..\n", __func__);fflush( stdout);
@@ -39,18 +59,30 @@ int unistd_select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds
 //	printf( "about to loop n=%d\n", n);fflush( stdout);
 	while (1)
 	{
+		int i, n;
+
 		n = readfds->fd_count - 1;
 		ret = 0;
 		for (i = n; i >= 0; i--)
 		{
-//			printf( "about to fake read h=%d to=%lu\n", (int)h, to);fflush( stdout);
-			h = (HANDLE)readfds->fd_array[0];
-			dw = PIPE_NOWAIT;
-			SetNamedPipeHandleState( h, &dw, NULL, NULL);
-			flag = ReadFile(h,&dw,0,&dw,NULL);
-			dw = 0;
-			SetNamedPipeHandleState( h, &dw, NULL, NULL);
-//			printf( "fake read returned %d dwread=%08lx\n", ret, dw);fflush(stdout);
+			HANDLE h;
+			int fd;
+			int flag = 0;
+
+			fd = (int)readfds->fd_array[0];
+			h = (HANDLE)fd;
+			if (unistd_FD_ISPIPE( fd))
+			{
+				DWORD dw;
+
+//				printf( "about to fake read h=%d to=%lu\n", (int)h, to);fflush( stdout);
+				dw = PIPE_NOWAIT;
+				SetNamedPipeHandleState( h, &dw, NULL, NULL);
+				flag = ReadFile(h,&dw,0,&dw,NULL);
+				dw = 0;
+				SetNamedPipeHandleState( h, &dw, NULL, NULL);
+//				printf( "fake read returned %d dwread=%08lx\n", ret, dw);fflush(stdout);
+			}
 			if (flag)
 			{
 				ret++;
@@ -139,7 +171,9 @@ int unistd_close( int fd)
 void unistd_FD_SET( int fd, fd_set *set)
 {
 	if (fd)
+	{
 		FD_SET( fd, set);
+	}
 }
 
 /*
