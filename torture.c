@@ -221,7 +221,7 @@ int main_net()
 	func = "setsockopt";		// should fail
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
-	ret = setsockopt( -666, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
+	ret = setsockopt( -666, SOL_SOCKET, SO_REUSEADDR, (const void *)&on, sizeof( on));
 	if (((ret != _ret || (errno != _err && errno != ENOTSOCK)) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
@@ -239,7 +239,7 @@ int main_net()
 	func = "setsockopt";		// should fail
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
-	ret = setsockopt( 0, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
+	ret = setsockopt( 0, SOL_SOCKET, SO_REUSEADDR, (const void *)&on, sizeof( on));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
@@ -257,7 +257,7 @@ int main_net()
 	func = "setsockopt";		// should fail
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
-	ret = setsockopt( sock, -666, SO_LINGER, (const void *)&on, sizeof( on));
+	ret = setsockopt( sock, -666, SO_REUSEADDR, (const void *)&on, sizeof( on));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
@@ -275,7 +275,7 @@ int main_net()
 	func = "setsockopt";		// should work
 	result = __LINE__;
 	printf( "Testing '%s' %s: ", func, _ret < 0 ? "failure" : "success");fflush( stdout);
-	ret = setsockopt( sock, SOL_SOCKET, SO_LINGER, (const void *)&on, sizeof( on));
+	ret = setsockopt( sock, SOL_SOCKET, SO_REUSEADDR, (const void *)&on, sizeof( on));
 	if (((ret != _ret || errno != _err) && _ret < 0) || (!_ret && !_err && ret))
 	{
 		printf( "FAIL : ret=%d, should be %d; errno=%d (%s), should be %d (%s)\n", ret, _ret, errno, strerror( errno), _err, strerror( _err));
