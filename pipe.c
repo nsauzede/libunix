@@ -14,7 +14,7 @@ int end = 0;
 
 void * task( void * opaque)
 {
-	void *result;
+	void *result = 0;
 	int max;
 	int fd = pfd[READ];
 	unsigned long id = (unsigned long)pthread_self();

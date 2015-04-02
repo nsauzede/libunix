@@ -383,6 +383,8 @@ int main_net()
 		printf( "SUCCESS : %s : ret=%d errno=%d (%s)\n", func, ret, _err, strerror( _err));fflush( stdout);
 	}
 
+	n = n;
+
 	result = 0;
 err:
 

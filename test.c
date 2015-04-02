@@ -129,6 +129,9 @@ void *task( void *opaque)
 	printf( "[%08lx] delta=%d\n", id, delta);fflush(stdout);
 	pthread_mutex_unlock( &lock);
 	seed = time( 0) + id;
+#ifdef WIN32
+	seed = seed;			// on WIN32, rand_r is defined to rand, so this var is unused
+#endif
 	while (!end)
 	{
 		unsigned long t;
